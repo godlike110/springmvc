@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/rabbit
+           http://www.springframework.org/schema/rabbit/spring-rabbit.xsd
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
+           
+    <context:annotation-config/>
+    <context:component-scan base-package="com.scgj.message"/>
+           
+    <rabbit:connection-factory id="connectionFactory" host="192.168.100.2" port="5672" username="scgj" password="scgj2014"/>
+                               
+    <rabbit:template id="rabbitTemplate" connection-factory="connectionFactory"/>
+    <rabbit:admin id="rabbitAdmin" connection-factory="connectionFactory"/>
+
+    <rabbit:queue id="smsQueue" name="sms_queue"/>
+
+    <rabbit:listener-container connection-factory="connectionFactory" acknowledge="auto">
+        <rabbit:listener id="smsListener" ref="smsListener" queues="smsQueue"/>
+    </rabbit:listener-container>
+
+    <rabbit:topic-exchange id="sms_topic" name="sms_topic">
+                <rabbit:bindings>
+                    <rabbit:binding pattern="sms_queue" queue="smsQueue"/>
+                </rabbit:bindings>
+    </rabbit:topic-exchange>
+</beans>
